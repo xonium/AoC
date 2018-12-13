@@ -10,7 +10,7 @@ namespace day12
         static void Main(string[] args)
         {
             var initialState = new List<Pot>();
-            var rules = new List<Rule>();
+            var rulesDictionary = new Dictionary<string, char>();
 
             var initialStateString = string.Empty;
 
@@ -22,7 +22,8 @@ namespace day12
 
                 for (int i = 2; i < splitted.Length; i++)
                 {
-                    rules.Add(new Rule(splitted[i]));
+                    var theRule = new Rule(splitted[i]);
+                    rulesDictionary.Add(theRule.RuleString, theRule.GeneratesChar);
                 }
             }
 
@@ -31,24 +32,24 @@ namespace day12
                 initialState.Add(new Pot(potChar));
             }
 
-            var generationGenerator = new GenerationGenerator(rules, 25);
+            var generationGenerator = new GenerationGenerator(rulesDictionary, 4);
 
             var generations = generationGenerator.Generate(initialState, 21);
-            int count = generationGenerator.CountPots(generations.Last(), generationGenerator.Offset);
+            long count = generationGenerator.CountPots(generations.Last(), generationGenerator.Offset);
 
             Print.Do(generations, count);
 
             Console.ReadLine();
-            /*Console.WriteLine("-- starting with part two --");
+            Console.WriteLine("-- starting with part two --");
 
-            var generationGeneratorPartTwo = new GenerationGenerator(rules, 100000);
+            var generationGeneratorPartTwo = new GenerationGenerator(rulesDictionary, 4);
             //var generationsPartTwo = generationGeneratorPartTwo.Generate(initialState, 50000000001);
-            var generationsPartTwo = generationGeneratorPartTwo.Generate(initialState, 100000);
+            var generationsPartTwo = generationGeneratorPartTwo.Generate(initialState, 50000000001);
 
             Console.WriteLine(generationGeneratorPartTwo.CountPots(generationsPartTwo.Last(), generationGeneratorPartTwo.Offset));
 
             Console.WriteLine("-- end part two --");
-            Console.ReadLine();*/
+            Console.ReadLine();
         }
     }
 
@@ -79,6 +80,11 @@ namespace day12
         private List<Pot> RuleToMatch { get; set; }
 
         public Pot Generates { get; set; }
+
+        public string RuleString { get; set; }
+
+        public char GeneratesChar { get; set; }
+
         public Rule(string rule)
         {
             _ruleString = rule;
@@ -89,8 +95,9 @@ namespace day12
             {
                 RuleToMatch.Add(new Pot(s));
             }
-
+            RuleString = splittedRule[0];
             Generates = new Pot(splittedRule[1][0]);
+            GeneratesChar = splittedRule[1][0];
         }
         
         public bool IsMatch(List<Pot> inputpots)
@@ -110,19 +117,20 @@ namespace day12
 
     public class GenerationGenerator
     {
-        public int Offset { get; set; }
+        public long Offset { get; set; }
+        public long HowMuchOffset { get; set; }
 
-        private  List<Rule> _rules { get; set; }
-        public GenerationGenerator(List<Rule> rules, int offset)
+        private Dictionary<string, char> _rules { get; set; }
+        public GenerationGenerator(Dictionary<string, char> rules, int offset)
         {
             _rules = rules;
             Offset = offset;
         }
 
-        public int CountPots(List<Pot> pots, int offset)
+        public long CountPots(List<Pot> pots, long offset)
         {
-            int index = -offset;
-            var result = 0;
+            long index = offset-HowMuchOffset;
+            long result = 0;
             foreach (var pot in pots)
             {
                 if (pot.ContainsPlant)
@@ -147,12 +155,12 @@ namespace day12
                 currentArrayList.Add(new Pot());
             }
 
-            currentArrayList.InsertRange(Offset, inputState);
+            currentArrayList.InsertRange(unchecked((int)Offset), inputState);
             var currentArray = currentArrayList.ToArray();
             var nextGenerationArray = currentArrayList.ToArray();
             result.Add(nextGenerationArray.ToList());
 
-            for (int g = 1; g < generations; g++)
+            for (long g = 1; g < generations; g++)
             {
                 for (int i = 0; i < currentArray.Length; i++)
                 {
@@ -165,20 +173,44 @@ namespace day12
                         i + 2 >= currentArray.Length ? new Pot('.') : currentArray[i + 2]
                     };
 
-
-                    foreach (var rule in _rules)
+                    if (_rules.TryGetValue($"{pots[0].Input}{pots[1].Input}{pots[2].Input}{pots[3].Input}{pots[4].Input}", out char rulesGenerates))
                     {
-                        if (rule.IsMatch(pots))
+                        nextGenerationArray[i] = new Pot(rulesGenerates);
+                    }
+                }
+
+                var nextGenerationList = nextGenerationArray.ToList();
+                var first = nextGenerationList.Take(6);
+                if(first.All(x => !x.ContainsPlant))
+                {
+                    nextGenerationList.RemoveRange(0, 4);
+                    Offset = Offset + 4;
+                    HowMuchOffset += 4;
+                }
+                
+                var last = nextGenerationList.TakeLast(4);
+                if (last.Any(x => x.ContainsPlant))
+                {
+                    var lastArray = last.ToArray();
+                    for (int i = lastArray.Length - 1; i > 0; i--)
+                    {
+                        if (lastArray[i].ContainsPlant)
                         {
-                            nextGenerationArray[i] = rule.Generates;
-                            break;
+                            var itemsToAdd = i + 1;
+                            for (int p = 0; p < itemsToAdd; p++)
+                            {
+                                nextGenerationList.Add(new Pot('.'));
+                            }
                         }
                     }
                 }
-                
-                result.Add(nextGenerationArray.ToList());
-                currentArray = nextGenerationArray.ToArray();
+
+                nextGenerationArray = nextGenerationList.ToArray();
+                currentArray = nextGenerationList.ToArray();
             }
+
+            HowMuchOffset = HowMuchOffset - 4;
+            result.Add(nextGenerationArray.ToList());
 
             return result;
         }
@@ -187,7 +219,7 @@ namespace day12
 
     public static class Print
     {
-        public static void Do(List<List<Pot>> generations, int pots, int offset=25)
+        public static void Do(List<List<Pot>> generations, long pots, long offset=25)
         {
             string counterTenString = "    ";
             for (int i = 0; i < offset; i++)
