@@ -35,12 +35,42 @@ namespace day18
 
 
             for (int i = 0; i < 1000; i++)
-            {
-                PrintTheField(fieldMatrix);
+            {                
+
                 fieldMatrix = GetNewState(fieldMatrix);
-                Console.WriteLine(Environment.NewLine + "------------------------------------------------" + Environment.NewLine);
+
+                //PrintTheField(fieldMatrix);
+                //Console.WriteLine(Environment.NewLine + "------------------------------------------------" + Environment.NewLine);
+                //CountObjects(fieldMatrix, i);
+                //Console.WriteLine(Environment.NewLine + "------------------------------------------------" + Environment.NewLine);
+
+                CountObjects(fieldMatrix, i);
+                //Console.Clear();
             }
 
+            Console.ReadLine();
+
+            var results = new List<int>() { 176900 , 183084, 189630, 197938, 205737, 216216, 215877,
+                215096, 215160, 217728, 217672, 219726, 214878, 189088,
+                191540, 199593, 199064,199283 ,186550,182252,176468,174028, 170016, 167445, 161214, 164666, 165599,171970 };
+            var counter = 0;
+            var theAnswer = 0;
+            for (long i = 423; i <= 1000000000; i++)
+            {
+                if (counter >= results.Count)
+                {
+                    counter = 0;
+                }
+
+                counter++;
+            }
+
+            Console.WriteLine("THE ANSWER:" + results[counter]);
+            Console.ReadLine();
+        }
+
+        private static void CountObjects(char[][] fieldMatrix, int index)
+        {
             var rowIndex = 0;
             var t = 0;
             var l = 0;
@@ -58,9 +88,7 @@ namespace day18
                 rowIndex++;
             }
             
-
-            Console.WriteLine($"t:{t} * l:{l} = {t * l}");
-            Console.ReadLine();
+            Console.WriteLine($"t:{t} * l:{l} = {t * l} index:{index}");
         }
 
         private static void PrintTheField(char[][] fieldMatrix)
