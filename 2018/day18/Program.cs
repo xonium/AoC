@@ -50,18 +50,51 @@ namespace day18
 
             Console.ReadLine();
 
-            var results = new List<int>() { 176900 , 183084, 189630, 197938, 205737, 216216, 215877,
-                215096, 215160, 217728, 217672, 219726, 214878, 189088,
-                191540, 199593, 199064,199283 ,186550,182252,176468,174028, 170016, 167445, 161214, 164666, 165599,171970 };
+            var results = new List<int>() {
+                171970,
+                176900,
+                183084,
+                189630,
+                197938,
+                205737,
+                216216,
+                215877,
+                215096,
+                215160,
+                217728,
+                217672,
+                219726,
+                214878,
+                189088,
+                191540,
+                199593,
+                199064,
+                199283,
+                186550,
+                182252,
+                176468,
+                174028,
+                170016,
+                167445,
+                161214,
+                164666,
+                165599
+            };
+
             var counter = 0;
             var theAnswer = 0;
-            for (long i = 423; i <= 1000000000; i++)
+            for (long i = 422; i < 1000000000; i++)
             {
                 if (counter >= results.Count)
                 {
                     counter = 0;
                 }
 
+                if(i > 1000000000 - 100)
+                {
+                    Console.WriteLine($"i: {i} - {results[counter]}");
+                }
+                
                 counter++;
             }
 
@@ -88,7 +121,9 @@ namespace day18
                 rowIndex++;
             }
             
-            Console.WriteLine($"t:{t} * l:{l} = {t * l} index:{index}");
+            //if(index % 28 == 0)
+                Console.WriteLine($"i: {index} - {t * l} ");
+            
         }
 
         private static void PrintTheField(char[][] fieldMatrix)
