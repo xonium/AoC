@@ -12,9 +12,9 @@ namespace day10
     {
         public const int SIZE = 200;
 
-        public const int OFFSET_X = 10;
+        public const int OFFSET_X = -20;
 
-        public const int OFFSET_Y = 10;
+        public const int OFFSET_Y = -20;
 
         public const float NORMALIZE_Y = 1;
         public const float NORMALIZE_X = 1;
@@ -71,7 +71,7 @@ namespace day10
                 
                 //CreateImage(i);
                 if(i > 10570) {
-                    //Console.Clear();
+                    Console.Clear();
                     for (int r = 0; r < StarView.Length; r++)
                     {
                         for (int p = 0; p < StarView[r].Length; p++)
@@ -80,9 +80,7 @@ namespace day10
                         }
                         Console.WriteLine();
                     }
-                    Console.WriteLine($"SECONDS -- {i}");
-
-
+                    
                     StarView = new char[SIZE][];
                     for (int a = 0; a < StarView.Length; a++)
                     {
